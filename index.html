@@ -1,0 +1,170 @@
+<!doctype html><html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PERFORM — Swim & Gym</title><style>
+:root{--bg:#07090c;--panel:#0f1319;--panel2:#151b23;--line:#252d38;--text:#f5f7fa;--muted:#8993a2;--accent:#55e7a5;--lsk:#4d8dff;--neppan:#ff5868;--skk:#55e7a5}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(900px 500px at 85% -10%,#17352b 0,transparent 55%),var(--bg);color:var(--text);font:14px Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}.app{min-height:100vh;display:flex}.sidebar{position:fixed;z-index:5;left:0;top:0;bottom:0;width:285px;background:#090c10f2;border-right:1px solid var(--line);padding:25px 15px;overflow:auto}.brand{font-size:23px;font-weight:950;letter-spacing:3px;padding:0 12px 28px}.brand b{color:var(--accent)}
+.navbtn,.eventbtn{display:block;width:100%;border:0;background:transparent;color:#929cac;text-align:left;cursor:pointer;border-radius:9px}.navbtn{padding:11px 13px;margin:2px 0}.navbtn:hover,.navbtn.active,.eventbtn:hover,.eventbtn.active{background:var(--panel2);color:var(--text)}.navbtn.active{box-shadow:inset 3px 0 var(--accent)}.event-title{margin:27px 10px 8px;color:#687384;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;font-weight:850}.eventbtn{padding:7px 11px;font-size:12px}.course{float:right;color:#5f6a79;font-size:10px;padding-top:2px}
+.main{margin-left:285px;width:calc(100% - 285px);max-width:1450px;padding:42px clamp(22px,5vw,64px)}.page{display:none}.page.active{display:block}.eyebrow{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:900}.title{font-size:42px;letter-spacing:-1.7px;font-weight:950;margin:7px 0 9px}.sub{margin:0;color:var(--muted)}.top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}.btn{border:0;background:var(--accent);color:#06130d;font-weight:900;padding:11px 16px;border-radius:9px;cursor:pointer}.ghost{border:1px solid var(--line);background:transparent;color:var(--text);font-weight:700;padding:10px 14px;border-radius:9px;cursor:pointer}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.card{background:linear-gradient(145deg,#12171e,#0d1116);border:1px solid var(--line);border-radius:14px;padding:18px}.label{color:#7e8998;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;font-weight:850}.big{font-size:31px;font-weight:950;margin-top:7px}.delta{color:var(--accent);font-size:12px;margin-top:5px}.section{margin-top:27px}.sectionhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.sectionhead h2{font-size:18px;margin:0}.select{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px 11px}
+.event-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:18px}.event-name{font-size:34px;font-weight:950;letter-spacing:-1px}.course-tag{color:#aab3bf;font-size:12px;margin-top:5px}.club-legend{display:flex;flex-wrap:wrap;gap:15px;margin:10px 0 0;color:#a0a9b6;font-size:11px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}.lsk{background:var(--lsk)}.neppan{background:var(--neppan)}.skk{background:var(--skk)}
+.pbgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.event-metrics{grid-template-columns:repeat(4,1fr)}.metric{font-size:28px;font-weight:950;margin-top:5px}.muted{color:var(--muted);font-size:12px}
+.chartcard{padding:18px}.chart{height:335px;position:relative}.chart svg{width:100%;height:100%;display:block}.gridline{stroke:#202833;stroke-width:1}.axistext{fill:#687383;font-size:11px}.plot{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}.point{stroke:#0b1015;stroke-width:3}.clubband{opacity:.06}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px 9px;border-bottom:1px solid var(--line);text-align:left}.table th{font-size:10px;color:#717c8c;text-transform:uppercase;letter-spacing:1.2px}.tag{font-size:11px;padding:4px 7px;border-radius:6px}.tag.lsk{background:#17243a;color:#77a9ff}.tag.neppan{background:#36191e;color:#ff8290}.tag.skk{background:#163027;color:#6ff0b5}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}.field input,.field select{width:100%;background:#090d12;border:1px solid var(--line);color:var(--text);padding:11px;border-radius:8px}.full{grid-column:1/-1}.modal{position:fixed;z-index:20;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.modalbox{width:min(570px,100%);background:#11161d;border:1px solid var(--line);border-radius:15px;padding:23px}.modalbox h3{font-size:21px;margin:0 0 18px}.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.empty{text-align:center;padding:45px 15px;color:var(--muted)}.gymrow{display:flex;gap:10px;align-items:center;justify-content:space-between}.exercise{font-weight:850}.small{font-size:11px;color:var(--muted)}
+@media(max-width:850px){.sidebar{width:72px;padding:20px 8px}.brand{font-size:0}.brand b{font-size:20px}.navbtn{font-size:0;text-align:center}.navbtn:first-letter{font-size:17px}.event-title,.eventbtn{display:none}.main{margin-left:72px;width:calc(100% - 72px);padding:27px 17px}.cards{grid-template-columns:1fr 1fr}.top{gap:15px}.title{font-size:34px}}
+@media(max-width:560px){.cards,.pbgrid,.event-metrics,.form{grid-template-columns:1fr}.top,.event-head{display:block}.top .btn{margin-top:15px}.event-name{font-size:28px}}
+</style></head><body>
+<div class="app"><aside class="sidebar"><div class="brand">PERF<b>ORM</b></div>
+<button class="navbtn active" data-page="home">◈ &nbsp; Start</button>
+<button class="navbtn" data-page="swim">≈ &nbsp; Simning</button>
+<button class="navbtn" data-page="gym">＋ &nbsp; Gymövningar</button>
+<div class="event-title">Simgrenar</div><div id="eventList"></div></aside>
+<main class="main">
+<section id="home" class="page active">
+<div class="top"><div><div class="eyebrow">Performance tracker</div><div class="title">Start</div><p class="sub">Din simutveckling mätt i FINA-poäng.</p></div><button class="btn" onclick="openAdd('swim')">+ Ny simtid</button></div>
+<div class="section card"><div class="sectionhead"><h2>Topp 3 grenar · PB</h2></div><div id="topThree" class="cards"></div></div>
+<div class="section card"><div class="sectionhead"><h2>Genomsnittliga FINA-poäng per månad</h2><span class="muted">15 m exkluderas · senaste tid per gren används</span></div><div id="avgChart" class="chart"></div><div id="avgLegend" class="club-legend"></div></div>
+</section>
+
+<section id="swim" class="page">
+<div class="top"><div><div class="eyebrow">Swim database</div><div class="title">Simning</div><p class="sub">Välj en gren till vänster för att se dess utveckling.</p></div></div>
+<div id="eventPage"></div>
+</section>
+
+<section id="gym" class="page">
+<div class="top"><div><div class="eyebrow">Strength database</div><div class="title">Gymövningar</div><p class="sub">Skapa exakt de övningar du själv vill följa.</p></div><button class="btn" onclick="openAdd('gym')">+ Lägg till lyft</button></div>
+<div class="cards"><div class="card"><div class="label">Övningar</div><div class="big" id="gymCount">0</div><div class="delta">skapade av dig</div></div></div>
+<div class="section card"><div class="sectionhead"><h2 id="gymChartTitle">Välj en övning</h2><select class="select" id="exerciseSelect" onchange="renderGym()"><option value="">— Ingen övning ännu —</option></select></div><div id="gymChart" class="empty">Lägg till din första övning för att börja följa utvecklingen.</div></div>
+<div class="section card"><div class="sectionhead"><h2>Senaste lyft</h2></div><table class="table"><thead><tr><th>Övning</th><th>Vikt</th><th>Reps</th><th>Datum</th></tr></thead><tbody id="gymTable"></tbody></table></div>
+</section>
+</main></div>
+
+<div class="modal" id="modal"><div class="modalbox"><h3 id="modalTitle">Ny registrering</h3><div id="modalBody"></div><div class="actions"><button class="ghost" onclick="closeModal()">Avbryt</button><button class="btn" onclick="saveModal()">Spara</button></div></div></div>
+
+<script>
+const EVENTS=[{"id": "50-fr", "name": "50 m frisim", "short": "50 FR", "course": "sc", "label": "50 m frisim · Kortbana"}, {"id": "50-fr-lc", "name": "50 m frisim", "short": "50 FR", "course": "lc", "label": "50 m frisim · Långbana"}, {"id": "100-fr", "name": "100 m frisim", "short": "100 FR", "course": "sc", "label": "100 m frisim · Kortbana"}, {"id": "100-fr-lc", "name": "100 m frisim", "short": "100 FR", "course": "lc", "label": "100 m frisim · Långbana"}, {"id": "200-fr", "name": "200 m frisim", "short": "200 FR", "course": "sc", "label": "200 m frisim · Kortbana"}, {"id": "200-fr-lc", "name": "200 m frisim", "short": "200 FR", "course": "lc", "label": "200 m frisim · Långbana"}, {"id": "400-fr", "name": "400 m frisim", "short": "400 FR", "course": "sc", "label": "400 m frisim · Kortbana"}, {"id": "400-fr-lc", "name": "400 m frisim", "short": "400 FR", "course": "lc", "label": "400 m frisim · Långbana"}, {"id": "800-fr", "name": "800 m frisim", "short": "800 FR", "course": "sc", "label": "800 m frisim · Kortbana"}, {"id": "800-fr-lc", "name": "800 m frisim", "short": "800 FR", "course": "lc", "label": "800 m frisim · Långbana"}, {"id": "1500-fr", "name": "1500 m frisim", "short": "1500 FR", "course": "sc", "label": "1500 m frisim · Kortbana"}, {"id": "1500-fr-lc", "name": "1500 m frisim", "short": "1500 FR", "course": "lc", "label": "1500 m frisim · Långbana"}, {"id": "50-bk", "name": "50 m ryggsim", "short": "50 BK", "course": "sc", "label": "50 m ryggsim · Kortbana"}, {"id": "50-bk-lc", "name": "50 m ryggsim", "short": "50 BK", "course": "lc", "label": "50 m ryggsim · Långbana"}, {"id": "100-bk", "name": "100 m ryggsim", "short": "100 BK", "course": "sc", "label": "100 m ryggsim · Kortbana"}, {"id": "100-bk-lc", "name": "100 m ryggsim", "short": "100 BK", "course": "lc", "label": "100 m ryggsim · Långbana"}, {"id": "200-bk", "name": "200 m ryggsim", "short": "200 BK", "course": "sc", "label": "200 m ryggsim · Kortbana"}, {"id": "200-bk-lc", "name": "200 m ryggsim", "short": "200 BK", "course": "lc", "label": "200 m ryggsim · Långbana"}, {"id": "50-br", "name": "50 m bröstsim", "short": "50 BR", "course": "sc", "label": "50 m bröstsim · Kortbana"}, {"id": "50-br-lc", "name": "50 m bröstsim", "short": "50 BR", "course": "lc", "label": "50 m bröstsim · Långbana"}, {"id": "100-br", "name": "100 m bröstsim", "short": "100 BR", "course": "sc", "label": "100 m bröstsim · Kortbana"}, {"id": "100-br-lc", "name": "100 m bröstsim", "short": "100 BR", "course": "lc", "label": "100 m bröstsim · Långbana"}, {"id": "200-br", "name": "200 m bröstsim", "short": "200 BR", "course": "sc", "label": "200 m bröstsim · Kortbana"}, {"id": "200-br-lc", "name": "200 m bröstsim", "short": "200 BR", "course": "lc", "label": "200 m bröstsim · Långbana"}, {"id": "50-fl", "name": "50 m fjärilsim", "short": "50 FL", "course": "sc", "label": "50 m fjärilsim · Kortbana"}, {"id": "50-fl-lc", "name": "50 m fjärilsim", "short": "50 FL", "course": "lc", "label": "50 m fjärilsim · Långbana"}, {"id": "100-fl", "name": "100 m fjärilsim", "short": "100 FL", "course": "sc", "label": "100 m fjärilsim · Kortbana"}, {"id": "100-fl-lc", "name": "100 m fjärilsim", "short": "100 FL", "course": "lc", "label": "100 m fjärilsim · Långbana"}, {"id": "200-fl", "name": "200 m fjärilsim", "short": "200 FL", "course": "sc", "label": "200 m fjärilsim · Kortbana"}, {"id": "200-fl-lc", "name": "200 m fjärilsim", "short": "200 FL", "course": "lc", "label": "200 m fjärilsim · Långbana"}, {"id": "100-im", "name": "100 m medley", "short": "100 IM", "course": "sc", "label": "100 m medley · Kortbana"}, {"id": "200-im", "name": "200 m medley", "short": "200 IM", "course": "sc", "label": "200 m medley · Kortbana"}, {"id": "200-im-lc", "name": "200 m medley", "short": "200 IM", "course": "lc", "label": "200 m medley · Långbana"}, {"id": "400-im", "name": "400 m medley", "short": "400 IM", "course": "sc", "label": "400 m medley · Kortbana"}, {"id": "400-im-lc", "name": "400 m medley", "short": "400 IM", "course": "lc", "label": "400 m medley · Långbana"}, {"id":"15m","name":"15 m","short":"15 M","course":"15","label":"15 m"}];
+const CLUBS=[
+ {name:'LSK',from:'2021-08-01',to:'2024-09-30',cls:'lsk'},
+ {name:'Neptun',from:'2024-10-01',to:'2025-07-31',cls:'neppan'},
+ {name:'SKK',from:'2025-08-01',to:'2026-07-31',cls:'skk'},
+ {name:'LSK',from:'2026-08-01',to:null,cls:'lsk'}
+];
+if(localStorage.getItem('perform_schema')!=='fina-v7'){localStorage.removeItem('perform_swim');localStorage.removeItem('perform_gym');localStorage.removeItem('perform_wr');localStorage.setItem('perform_schema','fina-v7')}
+let data=JSON.parse(localStorage.getItem('perform_swim')||'[]');
+let gym=JSON.parse(localStorage.getItem('perform_gym')||'[]');
+let wr=JSON.parse(localStorage.getItem('perform_wr')||'{}');
+let modalMode='swim';
+function getWR(id){return Number(wr[id])||null}
+function fina(base,time){return 1000*Math.pow(base/time,3)}
+function clubColor(name){return name==='LSK'?'var(--lsk)':name==='Neptun'?'var(--neppan)':'var(--skk)'}
+
+
+function clubFor(date){let d=date; return CLUBS.find(c=>d>=c.from&&(c.to===null||d<=c.to))||{name:'—',cls:''}}
+function fmtTime(x){if(x===null||x===undefined||x==='')return '—';let n=Number(x);if(!isFinite(n))return x;return n>=60?Math.floor(n/60)+':'+(n%60).toFixed(2).padStart(5,'0'):n.toFixed(2)}
+function eventById(id){return EVENTS.find(e=>e.id===id)}
+function eventList(){document.getElementById('eventList').innerHTML=EVENTS.map(e=>`<button class="eventbtn" data-event="${e.id}" onclick="showEvent('${e.id}')">${e.label}<span class="course">${e.course==='sc'?'25 m':e.course==='lc'?'50 m':'15 m'}</span></button>`).join('')}
+function nav(page){document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page))}
+document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>nav(b.dataset.page));
+
+function chartSVG(rows, id='chart') {
+  if(!rows.length) return '<div class="empty">Ännu inga registrerade tider för den här grenen.<br><br>Klicka på <b>+ Lägg till tider</b> för att lägga till den första.</div>';
+  let vals=rows.map(r=>Number(r.time)), min=Math.min(...vals),max=Math.max(...vals), pad=Math.max((max-min)*.22,.5);
+  min-=pad;max+=pad; let W=900,H=330,L=58,R=20,T=25,B=48;
+  let xs=rows.map((r,i)=>L+(rows.length===1?(W-L-R)/2:i*(W-L-R)/(rows.length-1)));
+  let ys=rows.map(r=>T+(max-r.time)/(max-min)*(H-T-B));
+  let lines='',points='',lastClub='';
+  for(let i=0;i<rows.length;i++){
+    let c=clubFor(rows[i].date); if(i>0){let pc=clubFor(rows[i-1].date); let color=c.name==='LSK'?'var(--lsk)':c.name==='Neptun'?'var(--neppan)':'var(--skk)'; lines+=`<line class="plot" stroke="${color}" x1="${xs[i-1]}" y1="${ys[i-1]}" x2="${xs[i]}" y2="${ys[i]}"/>`;}
+    let color=c.name==='LSK'?'var(--lsk)':c.name==='Neptun'?'var(--neppan)':'var(--skk)';
+    points+=`<circle class="point" fill="${color}" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${fmtTime(rows[i].time)} · ${rows[i].date} · ${c.name}</title></circle>`;
+  }
+  let grids=''; for(let i=0;i<5;i++){let y=T+i*(H-T-B)/4,v=max-i*(max-min)/4;grids+=`<line class="gridline" x1="${L}" y1="${y}" x2="${W-R}" y2="${y}"/><text class="axistext" x="5" y="${y+4}">${fmtTime(v)}</text>`}
+  let xlabels=rows.map((r,i)=>i%Math.ceil(rows.length/6)===0?`<text class="axistext" x="${xs[i]-18}" y="${H-16}">${r.date.slice(0,4)}</text>`:'').join('');
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grids}${lines}${points}${xlabels}</svg>`;
+}
+
+function showEvent(id){
+ let e=eventById(id); if(!e)return; nav('swim'); document.querySelectorAll('.eventbtn').forEach(b=>b.classList.toggle('active',b.dataset.event===id));
+ let rows=data.filter(r=>r.event===id).sort((a,b)=>a.date.localeCompare(b.date));
+ let times=rows.map(r=>Number(r.time)).filter(Number.isFinite); let pb=times.length?Math.min(...times):null;
+ let latest=rows[rows.length-1], base=getWR(id);
+ let pbPts=(pb!==null&&base&&e.course!=='15')?Math.round(fina(base,pb)):null;
+ document.getElementById('eventPage').innerHTML=`<div class="event-head"><div><div class="event-name">${e.short}</div><div class="course-tag">${e.name} · ${e.course==='sc'?'Kortbana 25 m':e.course==='lc'?'Långbana 50 m':'15 meter'}</div></div><button class="ghost" onclick="openWR('${id}')">${base?'Redigera WR':'Lägg till WR'}</button></div>
+ <div class="cards event-metrics">
+  <div class="card"><div class="label">PB</div><div class="metric">${pb===null?'—':fmtTime(pb)}</div><div class="muted">${pb===null?'Ingen tid registrerad ännu':'PB · '+(rows.find(r=>Number(r.time)===pb)?.date||'')}</div></div>
+  <div class="card"><div class="label">Senaste tid</div><div class="metric">${latest?fmtTime(latest.time):'—'}</div><div class="muted">${latest?'Senast simmad · '+latest.date:'Ingen tid registrerad ännu'}</div></div>
+  <div class="card"><div class="label">WR</div><div class="metric">${base?fmtTime(base):'—'}</div><div class="muted">${base?'Din redigerbara bas-tid':'Ingen WR inlagd ännu'}</div></div>
+  <div class="card"><div class="label">FINA-poäng</div><div class="metric">${pbPts===null?'—':pbPts}</div><div class="muted">${pbPts===null?(e.course==='15'?'15 m ger inga FINA-poäng':'Kräver WR + registrerad tid'):'baserat på PB'}</div></div>
+ </div>
+ <div class="section"><button class="btn" onclick="openAdd('swim','${id}')">+ Lägg till tider</button></div>
+ <div class="section card chartcard"><div class="sectionhead"><h2>Utveckling över tid</h2></div><div class="club-legend"><span><i class="dot lsk"></i>LSK</span><span><i class="dot neppan"></i>Neptun</span><span><i class="dot skk"></i>SKK</span></div><div class="chart">${chartSVG(rows)}</div></div>
+ <div class="section card"><div class="sectionhead"><h2>Tider</h2></div><table class="table"><thead><tr><th>Tid</th><th>Datum</th><th>Klubb</th><th>FINA-poäng</th></tr></thead><tbody>${rows.slice().reverse().map(r=>{let c=clubFor(r.date),pts=(base&&e.course!=='15')?Math.round(fina(base,Number(r.time))):null;return `<tr><td><b>${fmtTime(r.time)}</b></td><td>${r.date}</td><td><span class="tag ${c.cls}">${c.name}</span></td><td>${pts===null?'—':'<b>'+pts+'</b>'}</td></tr>`}).join('')||'<tr><td colspan="4" class="empty">Inga tider ännu.</td></tr>'}</tbody></table></div>`;
+}
+function openWR(id){
+ const e=eventById(id); document.getElementById('modal').classList.add('open'); document.getElementById('modal').dataset.wrEvent=id;
+ document.getElementById('modalTitle').textContent='Redigera världsrekord';
+ document.getElementById('modalBody').innerHTML=`<div class="form"><div class="field full"><label>WR · ${e.label}</label><input id="wrValue" type="number" step="0.01" min="0.01" value="${getWR(id)||''}" placeholder="Ex. 46.40"></div></div><div class="muted" style="margin-top:10px">WR används som B i formeln: 1000 × (WR / T)³.</div>`;
+}
+
+function openAdd(mode,defaultEvent='50-fr'){
+ modalMode=mode;delete document.getElementById('modal').dataset.wrEvent;document.getElementById('modal').classList.add('open');
+ if(mode==='swim'){
+  document.getElementById('modalTitle').textContent='Lägg till simtid';
+  document.getElementById('modalBody').innerHTML=`<div class="form">
+  <div class="field full"><label>Gren</label><select id="mEvent">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===defaultEvent?'selected':''}>${e.label}</option>`).join('')}</select></div>
+  <div class="field"><label>Tid / sekunder</label><input id="mTime" placeholder="54.80"></div>
+  <div class="field"><label>Datum</label><input id="mDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+  <div class="field full"><label>Klubb (förvald från datum)</label><input id="mClub" readonly value="${clubFor(new Date().toISOString().slice(0,10)).name}"></div></div>`;
+  document.getElementById('mDate').onchange=e=>document.getElementById('mClub').value=clubFor(e.target.value).name;
+ } else {
+  document.getElementById('modalTitle').textContent='Lägg till gymövning / lyft';
+  document.getElementById('modalBody').innerHTML=`<div class="form">
+  <div class="field full"><label>Övning</label><input id="gExercise" placeholder="Ex. Bänkpress"></div>
+  <div class="field"><label>Vikt (kg)</label><input id="gWeight" type="number" step="0.5" placeholder="80"></div>
+  <div class="field"><label>Reps</label><input id="gReps" type="number" placeholder="5"></div>
+  <div class="field full"><label>Datum</label><input id="gDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div></div>`;
+ }
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function saveModal(){
+ const wrEvent=document.getElementById('modal').dataset.wrEvent;
+ if(wrEvent){let v=parseFloat(document.getElementById('wrValue').value);if(!isFinite(v)||v<=0)return alert('Fyll i en giltig WR-tid.');wr[wrEvent]=v;localStorage.setItem('perform_wr',JSON.stringify(wr));delete document.getElementById('modal').dataset.wrEvent;closeModal();showEvent(wrEvent);renderHome();return}
+ if(modalMode==='swim'){
+  let event=document.getElementById('mEvent').value,time=parseFloat(document.getElementById('mTime').value),date=document.getElementById('mDate').value;
+  if(!event||!isFinite(time)||!date)return alert('Fyll i gren, tid och datum.');
+  data.push({event,time,date,club:clubFor(date).name});localStorage.setItem('perform_swim',JSON.stringify(data));closeModal();showEvent(event);renderHome();
+ } else {
+  let exercise=document.getElementById('gExercise').value.trim(),weight=parseFloat(document.getElementById('gWeight').value),reps=parseInt(document.getElementById('gReps').value),date=document.getElementById('gDate').value;
+  if(!exercise||!isFinite(weight)||!isFinite(reps)||!date)return alert('Fyll i övning, vikt, reps och datum.');
+  gym.push({exercise,weight,reps,date});localStorage.setItem('perform_gym',JSON.stringify(gym));closeModal();renderGym();renderHome();
+ }
+}
+function renderHome(){
+ const eligible=EVENTS.filter(e=>e.course!=='15');
+ const best=eligible.map(e=>{const rows=data.filter(r=>r.event===e.id&&getWR(e.id));if(!rows.length)return null;const pb=Math.min(...rows.map(r=>Number(r.time)));return {e,pb,pts:fina(getWR(e.id),pb)}}).filter(Boolean).sort((a,b)=>b.pts-a.pts).slice(0,3);
+ document.getElementById('topThree').innerHTML=best.length?best.map((x,i)=>`<div class="card"><div class="label">#${i+1} · ${x.e.label}</div><div class="big">${Math.round(x.pts)} pts</div><div class="delta">PB · ${fmtTime(x.pb)}</div></div>`).join(''):'<div class="empty">Lägg in tider och WR för att se topp 3.</div>';
+ const dates=data.filter(r=>r.event&&eventById(r.event)?.course!=='15').map(r=>r.date).sort();
+ if(!dates.length){document.getElementById('avgChart').innerHTML='<div class="empty">Lägg in tider + WR för att börja se månadsutvecklingen.</div>';document.getElementById('avgLegend').innerHTML='';return}
+ let first=new Date(dates[0]+'T00:00:00'),last=new Date(dates[dates.length-1]+'T00:00:00');first=new Date(first.getFullYear(),first.getMonth(),1);last=new Date(last.getFullYear(),last.getMonth(),1);
+ const months=[];for(let d=new Date(first);d<=last;d.setMonth(d.getMonth()+1))months.push(new Date(d));
+ const points=months.map(m=>{
+  const cutoff=new Date(m.getFullYear(),m.getMonth()+1,0), vals=[];
+  eligible.forEach(e=>{if(!getWR(e.id))return;const rows=data.filter(r=>r.event===e.id&&new Date(r.date+'T00:00:00')<=cutoff).sort((a,b)=>a.date.localeCompare(b.date));if(rows.length){const r=rows[rows.length-1];vals.push({pts:fina(getWR(e.id),Number(r.time)),club:clubFor(r.date).name,date:r.date})}});
+  if(!vals.length)return null;return {m,avg:vals.reduce((a,x)=>a+x.pts,0)/vals.length,club:vals[vals.length-1].club};
+ }).filter(Boolean);
+ if(!points.length){document.getElementById('avgChart').innerHTML='<div class="empty">Lägg in tider + WR för att börja se månadsutvecklingen.</div>';return}
+ const W=900,H=335,L=58,R=20,T=25,B=48,vals=points.map(p=>p.avg),min=Math.min(...vals),max=Math.max(...vals),pad=Math.max((max-min)*.18,10),xs=points.map((p,i)=>L+(points.length===1?(W-L-R)/2:i*(W-L-R)/(points.length-1))),ys=points.map(p=>T+(max+pad-p.avg)/(max+2*pad-min)*(H-T-B));
+ let grid='';for(let i=0;i<5;i++){let y=T+i*(H-T-B)/4,v=max+pad-i*(max+2*pad-min)/4;grid+=`<line class="gridline" x1="${L}" y1="${y}" x2="${W-R}" y2="${y}"/><text class="axistext" x="5" y="${y+4}">${Math.round(v)}</text>`}
+ let lines='',pts='';for(let i=0;i<points.length;i++){if(i){let color=clubColor(points[i].club);lines+=`<line class="plot" stroke="${color}" x1="${xs[i-1]}" y1="${ys[i-1]}" x2="${xs[i]}" y2="${ys[i]}"/>`}let color=clubColor(points[i].club);pts+=`<circle class="point" fill="${color}" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${Math.round(points[i].avg)} FINA · ${points[i].m.getFullYear()}-${String(points[i].m.getMonth()+1).padStart(2,'0')} · ${points[i].club}</title></circle>`}
+ let labels=points.map((p,i)=>(i%Math.ceil(points.length/8)===0||i===points.length-1)?`<text class="axistext" x="${xs[i]-18}" y="${H-16}">${p.m.getFullYear()}-${String(p.m.getMonth()+1).padStart(2,'0')}</text>`:'').join('');
+ document.getElementById('avgChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grid}${lines}${pts}${labels}</svg>`;
+ document.getElementById('avgLegend').innerHTML='<span><i class="dot lsk"></i>LSK</span><span><i class="dot neppan"></i>Neptun</span><span><i class="dot skk"></i>SKK</span>';
+}
+function renderGym(){
+ let exercises=[...new Set(gym.map(x=>x.exercise))],sel=document.getElementById('exerciseSelect');let old=sel.value;
+ sel.innerHTML=exercises.length?exercises.map(x=>`<option>${x}</option>`).join(''):'<option value="">— Ingen övning ännu —</option>';if(exercises.includes(old))sel.value=old;
+ let chosen=sel.value,rows=gym.filter(x=>x.exercise===chosen).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById('gymCount').textContent=exercises.length;
+ document.getElementById('gymChartTitle').textContent=chosen||'Välj en övning';
+ if(chosen&&rows.length){let vals=rows.map(x=>x.weight),min=Math.min(...vals),max=Math.max(...vals),pad=Math.max((max-min)*.22,2),W=900,H=330,L=58,R=20,T=25,B=48,xs=rows.map((r,i)=>L+(rows.length===1?(W-L-R)/2:i*(W-L-R)/(rows.length-1))),ys=rows.map(r=>T+(max+pad-r.weight)/(max+2*pad-min)*(H-T-B));let path=xs.map((x,i)=>(i?'L':'M')+' '+x+' '+ys[i]).join(' ');document.getElementById('gymChart').innerHTML=`<div class="chart"><svg viewBox="0 0 900 330" preserveAspectRatio="none"><path class="plot" stroke="var(--accent)" d="${path}"/>${rows.map((r,i)=>`<circle class="point" fill="var(--accent)" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${r.weight} kg × ${r.reps} · ${r.date}</title></circle>`).join('')}</svg></div>`}else document.getElementById('gymChart').innerHTML='<div class="empty">Välj eller lägg till en övning för att se grafen.</div>';
+ document.getElementById('gymTable').innerHTML=gym.slice().reverse().map(r=>`<tr><td>${r.exercise}</td><td><b>${r.weight} kg</b></td><td>${r.reps}</td><td>${r.date}</td></tr>`).join('')||'<tr><td colspan="4" class="empty">Inga lyft registrerade ännu.</td></tr>';
+}
+eventList();renderHome();renderGym();showEvent('50-fr');
+</script></body></html>
