@@ -32,7 +32,7 @@ button,input,select{font:inherit}.app{min-height:100vh;display:flex}.sidebar{pos
 <button class="navbtn active" data-page="home">◈ &nbsp; Start</button>
 <button class="navbtn" data-page="swim">≈ &nbsp; Simning</button>
 <button class="navbtn" data-page="gym">＋ &nbsp; Gymövningar</button>
-<div class="event-title">Simgrenar</div><div id="eventList"></div><button id="signOutBtn" class="ghost signout" onclick="logout()">Logga ut</button></aside>
+<div class="event-title">Simgrenar</div><div id="eventList"></div><button class="ghost signout" onclick="refreshCloud()">↻ Synka nu</button><button id="signOutBtn" class="ghost signout" onclick="logout()">Logga ut</button></aside>
 <main class="main">
 <section id="home" class="page active">
 <div class="top"><div><div class="eyebrow">Performance tracker</div><div class="title">Start</div><p class="sub">Din simutveckling mätt i FINA-poäng.</p></div><button class="btn" onclick="openAdd('swim')">+ Ny simtid</button></div>
@@ -49,7 +49,7 @@ button,input,select{font:inherit}.app{min-height:100vh;display:flex}.sidebar{pos
 <div class="top"><div><div class="eyebrow">Strength database</div><div class="title">Gymövningar</div><p class="sub">Skapa exakt de övningar du själv vill följa.</p></div><button class="btn" onclick="openAdd('gym')">+ Lägg till lyft</button></div>
 <div class="cards"><div class="card"><div class="label">Övningar</div><div class="big" id="gymCount">0</div><div class="delta">skapade av dig</div></div></div>
 <div class="section card"><div class="sectionhead"><h2 id="gymChartTitle">Välj en övning</h2><select class="select" id="exerciseSelect" onchange="renderGym()"><option value="">— Ingen övning ännu —</option></select></div><div id="gymChart" class="empty">Lägg till din första övning för att börja följa utvecklingen.</div></div>
-<div class="section card"><div class="sectionhead"><h2>Senaste lyft</h2></div><table class="table"><thead><tr><th>Övning</th><th>Vikt</th><th>Reps</th><th>Datum</th></tr></thead><tbody id="gymTable"></tbody></table></div>
+<div class="section card"><div class="sectionhead"><h2>Senaste lyft</h2></div><table class="table"><thead><tr><th>Övning</th><th>Vikt</th><th>Reps</th><th>Datum</th><th></th></tr></thead><tbody id="gymTable"></tbody></table></div>
 </section>
 </main></div>
 
@@ -68,8 +68,8 @@ const SUPABASE_URL='https://fmpxzqjiafjhwmahuoov.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_WnLQX8-L_Cxg4tVp2h70AA_caBflnNy';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 let data=[];
-let gym=JSON.parse(localStorage.getItem('perform_gym')||'[]');
-let wr=JSON.parse(localStorage.getItem('perform_wr')||'{}');
+let gym=[];
+let wr={};
 let modalMode='swim';
 function getWR(id){return Number(wr[id])||null}
 function fina(base,time){return 1000*Math.pow(base/time,3)}
@@ -159,7 +159,24 @@ function openAdd(mode,defaultEvent='50-fr'){
 function closeModal(){document.getElementById('modal').classList.remove('open')}
 async function saveModal(){
  const wrEvent=document.getElementById('modal').dataset.wrEvent;
- if(wrEvent){let v=readTime('wrMin','wrSec','wrHun');if(v===null||v<=0)return alert('Fyll i en giltig WR-tid.');wr[wrEvent]=v;localStorage.setItem('perform_wr',JSON.stringify(wr));delete document.getElementById('modal').dataset.wrEvent;closeModal();showEvent(wrEvent);renderHome();return}
+ if(wrEvent){
+  let v=readTime('wrMin','wrSec','wrHun');
+  if(v===null||v<=0)return alert('Fyll i en giltig WR-tid.');
+  const {data:existing,error:findErr}=await sb.from('world_records').select('id').eq('event',wrEvent).limit(1);
+  if(findErr){alert('Kunde inte läsa WR: '+findErr.message);return;}
+  let wrError=null;
+  if(existing&&existing.length){
+    const res=await sb.from('world_records').update({time:v}).eq('id',existing[0].id);
+    wrError=res.error;
+  }else{
+    const res=await sb.from('world_records').insert({event:wrEvent,time:v});
+    wrError=res.error;
+  }
+  if(wrError){alert('Kunde inte spara WR: '+wrError.message);return;}
+  await loadWorldRecords();
+  delete document.getElementById('modal').dataset.wrEvent;
+  closeModal();showEvent(wrEvent);renderHome();return;
+}
  if(modalMode==='swim'){
   let event=document.getElementById('mEvent').value,time=readTime('mMin','mSec','mHun'),date=document.getElementById('mDate').value;
   if(!event||!isFinite(time)||!date)return alert('Fyll i gren, tid och datum.');
@@ -169,10 +186,22 @@ async function saveModal(){
  } else {
   let exercise=document.getElementById('gExercise').value.trim(),weight=parseFloat(document.getElementById('gWeight').value),reps=parseInt(document.getElementById('gReps').value),date=document.getElementById('gDate').value;
   if(!exercise||!isFinite(weight)||!isFinite(reps)||!date)return alert('Fyll i övning, vikt, reps och datum.');
-  gym.push({exercise,weight,reps,date});localStorage.setItem('perform_gym',JSON.stringify(gym));closeModal();renderGym();renderHome();
+  const {error}=await sb.from('gym_logs').insert({exercise,weight,reps,date});
+   if(error){alert('Kunde inte spara gymresultatet: '+error.message);return;}
+   await loadGymLogs();closeModal();renderGym();renderHome();
  }
 }
 
+async function loadWorldRecords(){
+  const {data:rows,error}=await sb.from('world_records').select('id,event,time,created_at').order('created_at',{ascending:true});
+  if(error){console.error(error);alert('Kunde inte läsa WR från molnet: '+error.message);return false;}
+  wr={};(rows||[]).forEach(r=>{wr[r.event]=Number(r.time)});return true;
+}
+async function loadGymLogs(){
+  const {data:rows,error}=await sb.from('gym_logs').select('id,exercise,weight,reps,date,created_at').order('date',{ascending:true}).order('created_at',{ascending:true});
+  if(error){console.error(error);alert('Kunde inte läsa gymdata från molnet: '+error.message);return false;}
+  gym=(rows||[]).map(r=>({...r,weight:Number(r.weight),reps:Number(r.reps)}));return true;
+}
 async function loadCloudTimes(){
   const {data:rows,error}=await sb.from('swim_times').select('id,event,time,date,created_at').order('date',{ascending:true}).order('created_at',{ascending:true});
   if(error){console.error(error);alert('Kunde inte läsa simtider från molnet: '+error.message);return false;}
@@ -189,6 +218,12 @@ async function login(){
   status.textContent='';
   await startSignedInApp();
 }
+async function refreshCloud(){
+  await Promise.all([loadCloudTimes(),loadWorldRecords(),loadGymLogs()]);
+  renderHome();renderGym();
+  const active=document.querySelector('.eventbtn.active');
+  if(active)showEvent(active.dataset.event);
+}
 async function logout(){
   await sb.auth.signOut();
   data=[];
@@ -199,7 +234,7 @@ async function logout(){
 }
 async function startSignedInApp(){
   document.getElementById('authScreen').classList.add('hidden');
-  await loadCloudTimes();
+  await Promise.all([loadCloudTimes(),loadWorldRecords(),loadGymLogs()]);
   eventList();
   renderHome();
   renderGym();
@@ -236,13 +271,20 @@ function renderHome(){
  document.getElementById('avgChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grid}${lines}${pts}${labels}</svg>`;
  document.getElementById('avgLegend').innerHTML='<span><i class="dot lsk"></i>LSK</span><span><i class="dot neppan"></i>Neptun</span><span><i class="dot skk"></i>SKK</span>';
 }
+async function deleteGymLog(id){
+  if(!id)return;
+  if(!window.confirm('Ta bort det här gymresultatet?'))return;
+  const {error}=await sb.from('gym_logs').delete().eq('id',id);
+  if(error){alert('Kunde inte ta bort gymresultatet: '+error.message);return;}
+  await loadGymLogs();renderGym();renderHome();
+}
 function renderGym(){
  let exercises=[...new Set(gym.map(x=>x.exercise))],sel=document.getElementById('exerciseSelect');let old=sel.value;
  sel.innerHTML=exercises.length?exercises.map(x=>`<option>${x}</option>`).join(''):'<option value="">— Ingen övning ännu —</option>';if(exercises.includes(old))sel.value=old;
  let chosen=sel.value,rows=gym.filter(x=>x.exercise===chosen).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById('gymCount').textContent=exercises.length;
  document.getElementById('gymChartTitle').textContent=chosen||'Välj en övning';
  if(chosen&&rows.length){let vals=rows.map(x=>x.weight),min=Math.min(...vals),max=Math.max(...vals),pad=Math.max((max-min)*.22,2),W=900,H=330,L=58,R=20,T=25,B=48,xs=rows.map((r,i)=>L+(rows.length===1?(W-L-R)/2:i*(W-L-R)/(rows.length-1))),ys=rows.map(r=>T+(max+pad-r.weight)/(max+2*pad-min)*(H-T-B));let path=xs.map((x,i)=>(i?'L':'M')+' '+x+' '+ys[i]).join(' ');document.getElementById('gymChart').innerHTML=`<div class="chart"><svg viewBox="0 0 900 330" preserveAspectRatio="none"><path class="plot" stroke="var(--accent)" d="${path}"/>${rows.map((r,i)=>`<circle class="point" fill="var(--accent)" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${r.weight} kg × ${r.reps} · ${r.date}</title></circle>`).join('')}</svg></div>`}else document.getElementById('gymChart').innerHTML='<div class="empty">Välj eller lägg till en övning för att se grafen.</div>';
- document.getElementById('gymTable').innerHTML=gym.slice().reverse().map(r=>`<tr><td>${r.exercise}</td><td><b>${r.weight} kg</b></td><td>${r.reps}</td><td>${r.date}</td></tr>`).join('')||'<tr><td colspan="4" class="empty">Inga lyft registrerade ännu.</td></tr>';
+ document.getElementById('gymTable').innerHTML=gym.slice().reverse().map(r=>`<tr><td>${r.exercise}</td><td><b>${r.weight} kg</b></td><td>${r.reps}</td><td>${r.date}</td><td><button type="button" class="ghost" style="padding:6px 9px" onclick="deleteGymLog('${r.id}')">Ta bort</button></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Inga lyft registrerade ännu.</td></tr>';
 }
 initApp();
 </script></body></html>
