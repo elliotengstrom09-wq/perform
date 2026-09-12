@@ -8,15 +8,31 @@ button,input,select{font:inherit}.app{min-height:100vh;display:flex}.sidebar{pos
 .pbgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.event-metrics{grid-template-columns:repeat(4,1fr)}.metric{font-size:28px;font-weight:950;margin-top:5px}.muted{color:var(--muted);font-size:12px}
 .chartcard{padding:18px}.chart{height:335px;position:relative}.chart svg{width:100%;height:100%;display:block}.gridline{stroke:#202833;stroke-width:1}.axistext{fill:#687383;font-size:11px}.plot{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}.point{stroke:#0b1015;stroke-width:3}.clubband{opacity:.06}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px 9px;border-bottom:1px solid var(--line);text-align:left}.table th{font-size:10px;color:#717c8c;text-transform:uppercase;letter-spacing:1.2px}.tag{font-size:11px;padding:4px 7px;border-radius:6px}.tag.lsk{background:#17243a;color:#77a9ff}.tag.neppan{background:#36191e;color:#ff8290}.tag.skk{background:#163027;color:#6ff0b5}
 .form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}.field input,.field select{width:100%;background:#090d12;border:1px solid var(--line);color:var(--text);padding:11px;border-radius:8px}.time-inputs{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:8px}.time-inputs input{text-align:center}.time-hint{margin-top:6px;color:var(--muted);font-size:11px}.full{grid-column:1/-1}.modal{position:fixed;z-index:20;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.modalbox{width:min(570px,100%);background:#11161d;border:1px solid var(--line);border-radius:15px;padding:23px}.modalbox h3{font-size:21px;margin:0 0 18px}.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
-.empty{text-align:center;padding:45px 15px;color:var(--muted)}.gymrow{display:flex;gap:10px;align-items:center;justify-content:space-between}.exercise{font-weight:850}.small{font-size:11px;color:var(--muted)}
+.empty{text-align:center;padding:45px 15px;color:var(--muted)}
+.authscreen{position:fixed;z-index:100;inset:0;background:radial-gradient(900px 500px at 85% -10%,#17352b 0,transparent 55%),var(--bg);display:flex;align-items:center;justify-content:center;padding:22px}
+.authscreen.hidden{display:none}.authbox{width:min(430px,100%);background:linear-gradient(145deg,#12171e,#0d1116);border:1px solid var(--line);border-radius:18px;padding:26px}.authbrand{font-size:28px;font-weight:950;letter-spacing:3px;margin-bottom:6px}.authbrand b{color:var(--accent)}.authbox h2{font-size:24px;margin:22px 0 8px}.authbox p{color:var(--muted);line-height:1.5}.authstatus{min-height:20px;color:#ff8c98;font-size:12px;margin-top:10px}.authbox .field{margin-top:12px}.signout{margin-top:18px;width:100%;font-size:11px;padding:8px 10px}.gymrow{display:flex;gap:10px;align-items:center;justify-content:space-between}.exercise{font-weight:850}.small{font-size:11px;color:var(--muted)}
 @media(max-width:850px){.sidebar{width:148px;padding:18px 9px}.brand{font-size:18px;letter-spacing:2px;padding:0 8px 20px}.navbtn{font-size:12px;text-align:left;padding:10px 9px}.event-title{display:block;margin:22px 8px 7px;font-size:9px}.eventbtn{display:block;padding:7px 8px;font-size:10px;line-height:1.25}.eventbtn .course{font-size:8px}.main{margin-left:148px;width:calc(100% - 148px);padding:22px 12px}.cards{grid-template-columns:1fr 1fr}.top{gap:12px}.title{font-size:30px}}
 @media(max-width:560px){.cards,.pbgrid,.event-metrics,.form{grid-template-columns:1fr}.top,.event-head{display:block}.top .btn{margin-top:15px}.event-name{font-size:28px}.sidebar{width:148px}.main{margin-left:148px;width:calc(100% - 148px);padding:18px 10px}.sub{font-size:14px;line-height:1.35}.card{padding:16px}.metric{font-size:30px}.big{font-size:25px}}
-</style></head><body>
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head><body>
+<div class="authscreen" id="authScreen">
+  <div class="authbox">
+    <div class="authbrand">PERF<b>ORM</b></div>
+    <div class="eyebrow">Private cloud sync</div>
+    <h2>Logga in</h2>
+    <p>Använd kontot du skapade i Supabase. Dina simtider synkas då mellan iPhone och Mac.</p>
+    <div class="field"><label>E-post</label><input id="authEmail" type="email" autocomplete="username" placeholder="din e-post"></div>
+    <div class="field"><label>Lösenord</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="btn" style="width:100%;margin-top:16px" onclick="login()">Logga in</button>
+    <div class="authstatus" id="authStatus"></div>
+  </div>
+</div>
 <div class="app"><aside class="sidebar"><div class="brand">PERF<b>ORM</b></div>
 <button class="navbtn active" data-page="home">◈ &nbsp; Start</button>
 <button class="navbtn" data-page="swim">≈ &nbsp; Simning</button>
 <button class="navbtn" data-page="gym">＋ &nbsp; Gymövningar</button>
-<div class="event-title">Simgrenar</div><div id="eventList"></div></aside>
+<div class="event-title">Simgrenar</div><div id="eventList"></div><button id="signOutBtn" class="ghost signout" onclick="logout()">Logga ut</button></aside>
 <main class="main">
 <section id="home" class="page active">
 <div class="top"><div><div class="eyebrow">Performance tracker</div><div class="title">Start</div><p class="sub">Din simutveckling mätt i FINA-poäng.</p></div><button class="btn" onclick="openAdd('swim')">+ Ny simtid</button></div>
@@ -48,7 +64,10 @@ const CLUBS=[
  {name:'LSK',from:'2026-08-01',to:null,cls:'lsk'}
 ];
 if(localStorage.getItem('perform_schema')!=='fina-v7'){localStorage.removeItem('perform_swim');localStorage.removeItem('perform_gym');localStorage.removeItem('perform_wr');localStorage.setItem('perform_schema','fina-v7')}
-let data=JSON.parse(localStorage.getItem('perform_swim')||'[]');
+const SUPABASE_URL='https://fmpxzqjiafjhwmahuoov.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_WnLQX8-L_Cxg4tVp2h70AA_caBflnNy';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let data=[];
 let gym=JSON.parse(localStorage.getItem('perform_gym')||'[]');
 let wr=JSON.parse(localStorage.getItem('perform_wr')||'{}');
 let modalMode='swim';
@@ -84,11 +103,14 @@ function chartSVG(rows, id='chart') {
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grids}${lines}${points}${xlabels}</svg>`;
 }
 
-function deleteTime(index,eventId){
+async function deleteTime(index,eventId){
   if(index<0 || index>=data.length)return;
   if(!window.confirm('Ta bort den här tiden?'))return;
-  data.splice(index,1);
-  localStorage.setItem('perform_swim',JSON.stringify(data));
+  const row=data[index];
+  if(!row.id){alert('Posten saknar databas-id. Ladda om sidan och prova igen.');return;}
+  const {error}=await sb.from('swim_times').delete().eq('id',row.id);
+  if(error){alert('Kunde inte ta bort tiden: '+error.message);return;}
+  await loadCloudTimes();
   showEvent(eventId);
   renderHome();
 }
@@ -135,19 +157,64 @@ function openAdd(mode,defaultEvent='50-fr'){
  }
 }
 function closeModal(){document.getElementById('modal').classList.remove('open')}
-function saveModal(){
+async function saveModal(){
  const wrEvent=document.getElementById('modal').dataset.wrEvent;
  if(wrEvent){let v=readTime('wrMin','wrSec','wrHun');if(v===null||v<=0)return alert('Fyll i en giltig WR-tid.');wr[wrEvent]=v;localStorage.setItem('perform_wr',JSON.stringify(wr));delete document.getElementById('modal').dataset.wrEvent;closeModal();showEvent(wrEvent);renderHome();return}
  if(modalMode==='swim'){
   let event=document.getElementById('mEvent').value,time=readTime('mMin','mSec','mHun'),date=document.getElementById('mDate').value;
   if(!event||!isFinite(time)||!date)return alert('Fyll i gren, tid och datum.');
-  data.push({event,time,date,club:clubFor(date).name});localStorage.setItem('perform_swim',JSON.stringify(data));closeModal();showEvent(event);renderHome();
+  const {error}=await sb.from('swim_times').insert({event,time,date});
+  if(error){alert('Kunde inte spara tiden: '+error.message);return;}
+  await loadCloudTimes();closeModal();showEvent(event);renderHome();
  } else {
   let exercise=document.getElementById('gExercise').value.trim(),weight=parseFloat(document.getElementById('gWeight').value),reps=parseInt(document.getElementById('gReps').value),date=document.getElementById('gDate').value;
   if(!exercise||!isFinite(weight)||!isFinite(reps)||!date)return alert('Fyll i övning, vikt, reps och datum.');
   gym.push({exercise,weight,reps,date});localStorage.setItem('perform_gym',JSON.stringify(gym));closeModal();renderGym();renderHome();
  }
 }
+
+async function loadCloudTimes(){
+  const {data:rows,error}=await sb.from('swim_times').select('id,event,time,date,created_at').order('date',{ascending:true}).order('created_at',{ascending:true});
+  if(error){console.error(error);alert('Kunde inte läsa simtider från molnet: '+error.message);return false;}
+  data=(rows||[]).map(r=>({...r,time:Number(r.time)}));
+  return true;
+}
+async function login(){
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  const status=document.getElementById('authStatus');
+  status.textContent='Loggar in…';
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  if(error){status.textContent='Inloggningen misslyckades: '+error.message;return;}
+  status.textContent='';
+  await startSignedInApp();
+}
+async function logout(){
+  await sb.auth.signOut();
+  data=[];
+  document.getElementById('authPassword').value='';
+  document.getElementById('authScreen').classList.remove('hidden');
+  renderHome();
+  showEvent('50-fr');
+}
+async function startSignedInApp(){
+  document.getElementById('authScreen').classList.add('hidden');
+  await loadCloudTimes();
+  eventList();
+  renderHome();
+  renderGym();
+  showEvent('50-fr');
+}
+async function initApp(){
+  eventList();renderGym();
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){await startSignedInApp();}
+  else{
+    document.getElementById('authScreen').classList.remove('hidden');
+    renderHome();showEvent('50-fr');
+  }
+}
+
 function renderHome(){
  const eligible=EVENTS.filter(e=>!['15','25'].includes(e.course));
  const best=eligible.map(e=>{const rows=data.filter(r=>r.event===e.id&&getWR(e.id));if(!rows.length)return null;const pb=Math.min(...rows.map(r=>Number(r.time)));return {e,pb,pts:fina(getWR(e.id),pb)}}).filter(Boolean).sort((a,b)=>b.pts-a.pts).slice(0,3);
@@ -177,5 +244,5 @@ function renderGym(){
  if(chosen&&rows.length){let vals=rows.map(x=>x.weight),min=Math.min(...vals),max=Math.max(...vals),pad=Math.max((max-min)*.22,2),W=900,H=330,L=58,R=20,T=25,B=48,xs=rows.map((r,i)=>L+(rows.length===1?(W-L-R)/2:i*(W-L-R)/(rows.length-1))),ys=rows.map(r=>T+(max+pad-r.weight)/(max+2*pad-min)*(H-T-B));let path=xs.map((x,i)=>(i?'L':'M')+' '+x+' '+ys[i]).join(' ');document.getElementById('gymChart').innerHTML=`<div class="chart"><svg viewBox="0 0 900 330" preserveAspectRatio="none"><path class="plot" stroke="var(--accent)" d="${path}"/>${rows.map((r,i)=>`<circle class="point" fill="var(--accent)" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${r.weight} kg × ${r.reps} · ${r.date}</title></circle>`).join('')}</svg></div>`}else document.getElementById('gymChart').innerHTML='<div class="empty">Välj eller lägg till en övning för att se grafen.</div>';
  document.getElementById('gymTable').innerHTML=gym.slice().reverse().map(r=>`<tr><td>${r.exercise}</td><td><b>${r.weight} kg</b></td><td>${r.reps}</td><td>${r.date}</td></tr>`).join('')||'<tr><td colspan="4" class="empty">Inga lyft registrerade ännu.</td></tr>';
 }
-eventList();renderHome();renderGym();showEvent('50-fr');
+initApp();
 </script></body></html>
