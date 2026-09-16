@@ -11,8 +11,42 @@ button,input,select{font:inherit}.app{min-height:100vh;display:flex}.sidebar{pos
 .empty{text-align:center;padding:45px 15px;color:var(--muted)}
 .authscreen{position:fixed;z-index:100;inset:0;background:radial-gradient(900px 500px at 85% -10%,#17352b 0,transparent 55%),var(--bg);display:flex;align-items:center;justify-content:center;padding:22px}
 .authscreen.hidden{display:none}.authbox{width:min(430px,100%);background:linear-gradient(145deg,#12171e,#0d1116);border:1px solid var(--line);border-radius:18px;padding:26px}.authbrand{font-size:28px;font-weight:950;letter-spacing:3px;margin-bottom:6px}.authbrand b{color:var(--accent)}.authbox h2{font-size:24px;margin:22px 0 8px}.authbox p{color:var(--muted);line-height:1.5}.authstatus{min-height:20px;color:#ff8c98;font-size:12px;margin-top:10px}.authbox .field{margin-top:12px}.signout{margin-top:18px;width:100%;font-size:11px;padding:8px 10px}.gymrow{display:flex;gap:10px;align-items:center;justify-content:space-between}.exercise{font-weight:850}.small{font-size:11px;color:var(--muted)}
-@media(max-width:850px){.sidebar{width:148px;padding:18px 9px}.brand{font-size:18px;letter-spacing:2px;padding:0 8px 20px}.navbtn{font-size:12px;text-align:left;padding:10px 9px}.event-title{display:block;margin:22px 8px 7px;font-size:9px}.eventbtn{display:block;padding:7px 8px;font-size:10px;line-height:1.25}.eventbtn .course{font-size:8px}.main{margin-left:148px;width:calc(100% - 148px);padding:22px 12px}.cards{grid-template-columns:1fr 1fr}.top{gap:12px}.title{font-size:30px}}
-@media(max-width:560px){.cards,.pbgrid,.event-metrics,.form{grid-template-columns:1fr}.top,.event-head{display:block}.top .btn{margin-top:15px}.event-name{font-size:28px}.sidebar{width:148px}.main{margin-left:148px;width:calc(100% - 148px);padding:18px 10px}.sub{font-size:14px;line-height:1.35}.card{padding:16px}.metric{font-size:30px}.big{font-size:25px}}
+.rangebar{display:flex;flex-direction:column;gap:9px;margin:12px 0 6px}
+.range-selects{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rangefield{display:flex;flex-direction:column;gap:5px;min-width:0}
+.rangefield label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:800}
+.rangefield select{width:100%;min-width:0;background:#090d12;border:1px solid var(--line);color:var(--text);padding:10px 11px;border-radius:8px;font-size:14px}
+.range-presets{display:flex;gap:7px;flex-wrap:wrap}
+.range-preset{padding:8px 10px;min-height:38px}
+.range-preset.active{border-color:var(--accent);color:var(--accent)}
+
+
+@media(max-width:850px){
+ .sidebar{width:108px;padding:16px 7px}
+ .brand{font-size:15px;letter-spacing:1.4px;padding:0 7px 18px}
+ .navbtn{font-size:11px;padding:9px 7px}
+ .event-title{margin:18px 7px 6px;font-size:8px}
+ .eventbtn{padding:7px 7px;font-size:10px;line-height:1.15}
+ .eventbtn .event-full,.eventbtn .course{display:none}
+ .eventbtn .event-short{display:inline!important;font-weight:800;letter-spacing:.2px}
+ .main{margin-left:108px;width:calc(100% - 108px);padding:20px 10px}
+ .cards{grid-template-columns:1fr 1fr}
+ .top{gap:10px}.title{font-size:29px}
+ .table{display:block;overflow-x:auto;white-space:nowrap}
+ .chart{height:280px}
+}
+@media(max-width:560px){
+ .cards,.pbgrid,.event-metrics,.form{grid-template-columns:1fr}
+ .top,.event-head{display:block}.top .btn{margin-top:14px}
+ .event-name{font-size:26px}
+ .sidebar{width:96px}
+ .main{margin-left:96px;width:calc(100% - 96px);padding:16px 8px}
+ .sub{font-size:12px;line-height:1.35}.card{padding:13px}
+ .metric{font-size:27px}.big{font-size:23px}
+ .section{margin-top:18px}.chartcard{padding:12px}
+ .time-inputs{gap:5px}.time-inputs input{padding:10px 5px}.range-selects{grid-template-columns:1fr}.rangefield select{font-size:16px;padding:11px 9px}.range-presets{display:grid;grid-template-columns:1fr 1fr;gap:6px}.range-preset{width:100%;min-height:44px;padding:8px 6px}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head><body>
@@ -37,7 +71,17 @@ button,input,select{font:inherit}.app{min-height:100vh;display:flex}.sidebar{pos
 <section id="home" class="page active">
 <div class="top"><div><div class="eyebrow">Performance tracker</div><div class="title">Start</div><p class="sub">Din simutveckling mätt i FINA-poäng.</p></div><button class="btn" onclick="openAdd('swim')">+ Ny simtid</button></div>
 <div class="section card"><div class="sectionhead"><h2>Topp 3 grenar · PB</h2></div><div id="topThree" class="cards"></div></div>
-<div class="section card"><div class="sectionhead"><h2>Genomsnittliga FINA-poäng per månad</h2><span class="muted">15 m exkluderas · senaste tid per gren används</span></div><div id="avgChart" class="chart"></div><div id="avgLegend" class="club-legend"></div></div>
+<div class="section card">
+<div class="sectionhead">
+  <div>
+    <h2>Genomsnittliga FINA-poäng per månad</h2>
+    <div class="muted" style="margin-top:5px">15 m och 25 m exkluderas · senaste tillgängliga tid per gren används</div>
+  </div>
+</div>
+<div id="homeRangeControls"></div>
+<div id="avgChart" class="chart"></div>
+<div id="avgLegend" class="club-legend"></div>
+</div>
 </section>
 
 <section id="swim" class="page">
@@ -48,7 +92,7 @@ button,input,select{font:inherit}.app{min-height:100vh;display:flex}.sidebar{pos
 <section id="gym" class="page">
 <div class="top"><div><div class="eyebrow">Strength database</div><div class="title">Gymövningar</div><p class="sub">Skapa exakt de övningar du själv vill följa.</p></div><button class="btn" onclick="openAdd('gym')">+ Lägg till lyft</button></div>
 <div class="cards"><div class="card"><div class="label">Övningar</div><div class="big" id="gymCount">0</div><div class="delta">skapade av dig</div></div></div>
-<div class="section card"><div class="sectionhead"><h2 id="gymChartTitle">Välj en övning</h2><select class="select" id="exerciseSelect" onchange="renderGym()"><option value="">— Ingen övning ännu —</option></select></div><div id="gymChart" class="empty">Lägg till din första övning för att börja följa utvecklingen.</div></div>
+<div class="section card"><div class="sectionhead"><h2 id="gymChartTitle">Välj en övning</h2><select class="select" id="exerciseSelect" onchange="renderGym()"><option value="">— Ingen övning ännu —</option></select></div><div id="gymRangeControls"></div><div id="gymChart" class="empty">Lägg till din första övning för att börja följa utvecklingen.</div></div>
 <div class="section card"><div class="sectionhead"><h2>Senaste lyft</h2></div><table class="table"><thead><tr><th>Övning</th><th>Vikt</th><th>Reps</th><th>Datum</th><th></th></tr></thead><tbody id="gymTable"></tbody></table></div>
 </section>
 </main></div>
@@ -58,7 +102,7 @@ button,input,select{font:inherit}.app{min-height:100vh;display:flex}.sidebar{pos
 <script>
 const EVENTS=[{"id": "50-fr", "name": "50 m frisim", "short": "50 FR", "course": "sc", "label": "50 m frisim · Kortbana"}, {"id": "50-fr-lc", "name": "50 m frisim", "short": "50 FR", "course": "lc", "label": "50 m frisim · Långbana"}, {"id": "100-fr", "name": "100 m frisim", "short": "100 FR", "course": "sc", "label": "100 m frisim · Kortbana"}, {"id": "100-fr-lc", "name": "100 m frisim", "short": "100 FR", "course": "lc", "label": "100 m frisim · Långbana"}, {"id": "200-fr", "name": "200 m frisim", "short": "200 FR", "course": "sc", "label": "200 m frisim · Kortbana"}, {"id": "200-fr-lc", "name": "200 m frisim", "short": "200 FR", "course": "lc", "label": "200 m frisim · Långbana"}, {"id": "400-fr", "name": "400 m frisim", "short": "400 FR", "course": "sc", "label": "400 m frisim · Kortbana"}, {"id": "400-fr-lc", "name": "400 m frisim", "short": "400 FR", "course": "lc", "label": "400 m frisim · Långbana"}, {"id": "800-fr", "name": "800 m frisim", "short": "800 FR", "course": "sc", "label": "800 m frisim · Kortbana"}, {"id": "800-fr-lc", "name": "800 m frisim", "short": "800 FR", "course": "lc", "label": "800 m frisim · Långbana"}, {"id": "1500-fr", "name": "1500 m frisim", "short": "1500 FR", "course": "sc", "label": "1500 m frisim · Kortbana"}, {"id": "1500-fr-lc", "name": "1500 m frisim", "short": "1500 FR", "course": "lc", "label": "1500 m frisim · Långbana"}, {"id": "50-bk", "name": "50 m ryggsim", "short": "50 BK", "course": "sc", "label": "50 m ryggsim · Kortbana"}, {"id": "50-bk-lc", "name": "50 m ryggsim", "short": "50 BK", "course": "lc", "label": "50 m ryggsim · Långbana"}, {"id": "100-bk", "name": "100 m ryggsim", "short": "100 BK", "course": "sc", "label": "100 m ryggsim · Kortbana"}, {"id": "100-bk-lc", "name": "100 m ryggsim", "short": "100 BK", "course": "lc", "label": "100 m ryggsim · Långbana"}, {"id": "200-bk", "name": "200 m ryggsim", "short": "200 BK", "course": "sc", "label": "200 m ryggsim · Kortbana"}, {"id": "200-bk-lc", "name": "200 m ryggsim", "short": "200 BK", "course": "lc", "label": "200 m ryggsim · Långbana"}, {"id": "50-br", "name": "50 m bröstsim", "short": "50 BR", "course": "sc", "label": "50 m bröstsim · Kortbana"}, {"id": "50-br-lc", "name": "50 m bröstsim", "short": "50 BR", "course": "lc", "label": "50 m bröstsim · Långbana"}, {"id": "100-br", "name": "100 m bröstsim", "short": "100 BR", "course": "sc", "label": "100 m bröstsim · Kortbana"}, {"id": "100-br-lc", "name": "100 m bröstsim", "short": "100 BR", "course": "lc", "label": "100 m bröstsim · Långbana"}, {"id": "200-br", "name": "200 m bröstsim", "short": "200 BR", "course": "sc", "label": "200 m bröstsim · Kortbana"}, {"id": "200-br-lc", "name": "200 m bröstsim", "short": "200 BR", "course": "lc", "label": "200 m bröstsim · Långbana"}, {"id": "50-fl", "name": "50 m fjärilsim", "short": "50 FL", "course": "sc", "label": "50 m fjärilsim · Kortbana"}, {"id": "50-fl-lc", "name": "50 m fjärilsim", "short": "50 FL", "course": "lc", "label": "50 m fjärilsim · Långbana"}, {"id": "100-fl", "name": "100 m fjärilsim", "short": "100 FL", "course": "sc", "label": "100 m fjärilsim · Kortbana"}, {"id": "100-fl-lc", "name": "100 m fjärilsim", "short": "100 FL", "course": "lc", "label": "100 m fjärilsim · Långbana"}, {"id": "200-fl", "name": "200 m fjärilsim", "short": "200 FL", "course": "sc", "label": "200 m fjärilsim · Kortbana"}, {"id": "200-fl-lc", "name": "200 m fjärilsim", "short": "200 FL", "course": "lc", "label": "200 m fjärilsim · Långbana"}, {"id": "100-im", "name": "100 m medley", "short": "100 IM", "course": "sc", "label": "100 m medley · Kortbana"}, {"id": "200-im", "name": "200 m medley", "short": "200 IM", "course": "sc", "label": "200 m medley · Kortbana"}, {"id": "200-im-lc", "name": "200 m medley", "short": "200 IM", "course": "lc", "label": "200 m medley · Långbana"}, {"id": "400-im", "name": "400 m medley", "short": "400 IM", "course": "sc", "label": "400 m medley · Kortbana"}, {"id": "400-im-lc", "name": "400 m medley", "short": "400 IM", "course": "lc", "label": "400 m medley · Långbana"}, {"id":"25-fr","name":"25 m frisim","short":"25 FR","course":"25","label":"25 m frisim"},{"id":"25-bk","name":"25 m ryggsim","short":"25 BK","course":"25","label":"25 m ryggsim"},{"id":"25-br","name":"25 m bröstsim","short":"25 BR","course":"25","label":"25 m bröstsim"},{"id":"25-fl","name":"25 m fjärilsim","short":"25 FL","course":"25","label":"25 m fjärilsim"},{"id":"15m","name":"15 m","short":"15 M","course":"15","label":"15 m"}];
 const CLUBS=[
- {name:'LSK',from:'2021-08-01',to:'2024-09-30',cls:'lsk'},
+ {name:'LSK',from:'2018-01-01',to:'2024-09-30',cls:'lsk'},
  {name:'Neptun',from:'2024-10-01',to:'2025-07-31',cls:'neppan'},
  {name:'SKK',from:'2025-08-01',to:'2026-07-31',cls:'skk'},
  {name:'LSK',from:'2026-08-01',to:null,cls:'lsk'}
@@ -71,6 +115,153 @@ let data=[];
 let gym=[];
 let wr={};
 let modalMode='swim';
+let chartRanges={home:{from:'',to:''},swim:{},gym:{from:'',to:''}};
+
+function filterRowsByMonth(rows,from,to){
+  return rows.filter(r=>{
+    const m=(r.date||'').slice(0,7);
+    return (!from||m>=from)&&(!to||m<=to);
+  });
+}
+const MONTH_NAMES=['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+
+function monthLabel(key){
+  if(!key||key.length<7)return key||'';
+  const [y,m]=key.split('-').map(Number);
+  return `${MONTH_NAMES[(m||1)-1]} ${y}`;
+}
+function monthKeysBetween(first,last){
+  if(!first||!last)return [];
+  const [fy,fm]=first.split('-').map(Number),[ly,lm]=last.split('-').map(Number);
+  const out=[];
+  let y=fy,m=fm;
+  while(y<ly||(y===ly&&m<=lm)){
+    out.push(`${y}-${String(m).padStart(2,'0')}`);
+    m++;if(m===13){m=1;y++}
+    if(out.length>240)break;
+  }
+  return out;
+}
+function availableMonthsFromRows(rows){
+  const keys=rows.map(r=>(r.date||'').slice(0,7)).filter(Boolean).sort();
+  return keys.length?monthKeysBetween(keys[0],keys[keys.length-1]):[];
+}
+function monthOptions(months,selected,edgeLabel){
+  const opts=[`<option value="">${edgeLabel}</option>`];
+  months.forEach(k=>opts.push(`<option value="${k}" ${selected===k?'selected':''}>${monthLabel(k)}</option>`));
+  return opts.join('');
+}
+function rangeHtml(prefix,from='',to='',months=[],changeFn='',presetScope='',presetId=''){
+  const allActive=!from&&!to?' active':'';
+  return `<div class="rangebar">
+    <div class="range-selects">
+      <div class="rangefield">
+        <label>Från</label>
+        <select id="${prefix}From" onchange="${changeFn}">
+          ${monthOptions(months,from,'Första månaden')}
+        </select>
+      </div>
+      <div class="rangefield">
+        <label>Till</label>
+        <select id="${prefix}To" onchange="${changeFn}">
+          ${monthOptions(months,to,'Senaste månaden')}
+        </select>
+      </div>
+    </div>
+    <div class="range-presets">
+      <button type="button" class="ghost range-preset" onclick="applyRangePreset('${presetScope}','${presetId}',6)">6 mån</button>
+      <button type="button" class="ghost range-preset" onclick="applyRangePreset('${presetScope}','${presetId}',12)">1 år</button>
+      <button type="button" class="ghost range-preset" onclick="applyRangePreset('${presetScope}','${presetId}',24)">2 år</button>
+      <button type="button" class="ghost range-preset${allActive}" onclick="applyRangePreset('${presetScope}','${presetId}',0)">Allt</button>
+    </div>
+  </div>`;
+}
+function normalizeRange(from,to){
+  if(from&&to&&from>to)return {from:to,to:from};
+  return {from,to};
+}
+function applyRangePreset(scope,id,monthsBack){
+  let months=[];
+  if(scope==='home'){
+    const dates=data.filter(r=>{
+      const e=eventById(r.event);
+      return r.event&&e&&!['15','25'].includes(e.course);
+    }).map(r=>({date:r.date}));
+    months=availableMonthsFromRows(dates);
+  }else if(scope==='swim'){
+    months=availableMonthsFromRows(data.filter(r=>r.event===id));
+  }else if(scope==='gym'){
+    const chosen=document.getElementById('exerciseSelect')?.value||'';
+    months=availableMonthsFromRows(gym.filter(r=>r.exercise===chosen));
+  }
+  if(!months.length)return;
+  let from='',to='';
+  if(monthsBack>0){
+    to=months[months.length-1];
+    from=months[Math.max(0,months.length-monthsBack)];
+  }
+  if(scope==='home'){
+    chartRanges.home={from,to};renderHome();
+  }else if(scope==='swim'){
+    chartRanges.swim[id]={from,to};showEvent(id);
+  }else if(scope==='gym'){
+    chartRanges.gym={from,to};renderGym();
+  }
+}
+function niceStep(raw,kind='number'){
+  const steps=kind==='time'
+    ?[0.1,0.2,0.25,0.5,1,2,2.5,5,10,15,20,30,60,120,300]
+    :kind==='fina'
+      ?[1,2,5,10,20,25,50,100,200,250,500]
+      :[0.5,1,2,2.5,5,10,20,25,50,100,200];
+  for(const s of steps)if(raw<=s)return s;
+  const mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  const n=raw/mag;
+  const nice=n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10;
+  return nice*mag;
+}
+function niceScale(values,kind='number',tickCount=4){
+  if(!values.length)return {min:0,max:1,step:.25,ticks:[0,.25,.5,.75,1]};
+  let lo=Math.min(...values),hi=Math.max(...values);
+  if(lo===hi){
+    const base=kind==='time'?Math.max(.5,lo*.02):Math.max(1,Math.abs(lo)*.03);
+    lo-=base;hi+=base;
+  }
+  const raw=(hi-lo)/tickCount;
+  const step=niceStep(raw,kind);
+  let min=Math.floor(lo/step)*step;
+  let max=Math.ceil(hi/step)*step;
+  if(min===max)max=min+step*tickCount;
+  // Ensure roughly 4–6 intervals, with a little breathing room.
+  if((max-min)/step<3){min-=step;max+=step}
+  const ticks=[];
+  for(let v=min,i=0;v<=max+step*.001&&i<12;v+=step,i++)ticks.push(Number(v.toFixed(6)));
+  return {min,max,step,ticks};
+}
+function monthSpan(rows){
+  if(!rows.length)return 0;
+  const a=new Date(rows[0].date+'T00:00:00'),b=new Date(rows[rows.length-1].date+'T00:00:00');
+  return (b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth());
+}
+function dateTickLabel(date,span){
+  return span<=24?date.slice(0,7):date.slice(0,4);
+}
+function setHomeRange(){
+  const r=normalizeRange(document.getElementById('homeFrom')?.value||'',document.getElementById('homeTo')?.value||'');
+  chartRanges.home=r;renderHome();
+}
+function clearHomeRange(){chartRanges.home={from:'',to:''};renderHome()}
+function setSwimRange(id){
+  const r=normalizeRange(document.getElementById('swimFrom')?.value||'',document.getElementById('swimTo')?.value||'');
+  chartRanges.swim[id]=r;showEvent(id);
+}
+function clearSwimRange(id){chartRanges.swim[id]={from:'',to:''};showEvent(id)}
+function setGymRange(){
+  const r=normalizeRange(document.getElementById('gymFrom')?.value||'',document.getElementById('gymTo')?.value||'');
+  chartRanges.gym=r;renderGym();
+}
+function clearGymRange(){chartRanges.gym={from:'',to:''};renderGym()}
+
 function getWR(id){return Number(wr[id])||null}
 function fina(base,time){return 1000*Math.pow(base/time,3)}
 function clubColor(name){return name==='LSK'?'var(--lsk)':name==='Neptun'?'var(--neppan)':'var(--skk)'}
@@ -82,24 +273,34 @@ function splitTime(total){let n=Number(total)||0,m=Math.floor(n/60),rem=n-m*60,s
 function readTime(minId,secId,hunId){let m=parseInt(document.getElementById(minId)?.value||'0',10)||0,s=parseInt(document.getElementById(secId)?.value||'0',10)||0,h=parseInt(document.getElementById(hunId)?.value||'0',10)||0;if(m<0||s<0||s>59||h<0||h>99)return null;return m*60+s+h/100}
 function setTimeInputs(total,minId,secId,hunId){let t=splitTime(total);document.getElementById(minId).value=t.m;document.getElementById(secId).value=t.sec;document.getElementById(hunId).value=String(t.hun).padStart(2,'0')}
 function eventById(id){return EVENTS.find(e=>e.id===id)}
-function eventList(){document.getElementById('eventList').innerHTML=EVENTS.map(e=>`<button class="eventbtn" data-event="${e.id}" onclick="showEvent('${e.id}')">${e.label}<span class="course">${e.course==='sc'?'25 m':e.course==='lc'?'50 m':e.course==='25'?'25 m':'15 m'}</span></button>`).join('')}
+function eventList(){document.getElementById('eventList').innerHTML=EVENTS.map(e=>`<button class="eventbtn" data-event="${e.id}" onclick="showEvent('${e.id}')"><span class="event-full">${e.label}</span><span class="event-short" style="display:none">${e.short}${e.course==='lc'?' L':e.course==='sc'?' K':''}</span><span class="course">${e.course==='sc'?'25 m':e.course==='lc'?'50 m':e.course==='25'?'25 m':'15 m'}</span></button>`).join('')}
 function nav(page){document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page))}
 document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>nav(b.dataset.page));
 
 function chartSVG(rows, id='chart') {
-  if(!rows.length) return '<div class="empty">Ännu inga registrerade tider för den här grenen.<br><br>Klicka på <b>+ Lägg till tider</b> för att lägga till den första.</div>';
-  let vals=rows.map(r=>Number(r.time)), min=Math.min(...vals),max=Math.max(...vals), pad=Math.max((max-min)*.22,.5);
-  min-=pad;max+=pad; let W=900,H=330,L=58,R=20,T=25,B=48;
-  let xs=rows.map((r,i)=>L+(rows.length===1?(W-L-R)/2:i*(W-L-R)/(rows.length-1)));
-  let ys=rows.map(r=>T+(max-r.time)/(max-min)*(H-T-B));
-  let lines='',points='',lastClub='';
+  if(!rows.length) return '<div class="empty">Inga registrerade tider i den valda perioden.</div>';
+  const vals=rows.map(r=>Number(r.time)).filter(Number.isFinite);
+  const scale=niceScale(vals,'time',4);
+  const min=scale.min,max=scale.max;
+  const W=900,H=330,L=62,R=20,T=25,B=48;
+  const xs=rows.map((r,i)=>L+(rows.length===1?(W-L-R)/2:i*(W-L-R)/(rows.length-1)));
+  const ys=rows.map(r=>T+(max-Number(r.time))/(max-min)*(H-T-B));
+  let lines='',points='';
   for(let i=0;i<rows.length;i++){
-    let c=clubFor(rows[i].date); if(i>0){let pc=clubFor(rows[i-1].date); let color=c.name==='LSK'?'var(--lsk)':c.name==='Neptun'?'var(--neppan)':'var(--skk)'; lines+=`<line class="plot" stroke="${color}" x1="${xs[i-1]}" y1="${ys[i-1]}" x2="${xs[i]}" y2="${ys[i]}"/>`;}
-    let color=c.name==='LSK'?'var(--lsk)':c.name==='Neptun'?'var(--neppan)':'var(--skk)';
+    const c=clubFor(rows[i].date);
+    const color=clubColor(c.name);
+    if(i>0)lines+=`<line class="plot" stroke="${color}" x1="${xs[i-1]}" y1="${ys[i-1]}" x2="${xs[i]}" y2="${ys[i]}"/>`;
     points+=`<circle class="point" fill="${color}" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${fmtTime(rows[i].time)} · ${rows[i].date} · ${c.name}</title></circle>`;
   }
-  let grids=''; for(let i=0;i<5;i++){let y=T+i*(H-T-B)/4,v=max-i*(max-min)/4;grids+=`<line class="gridline" x1="${L}" y1="${y}" x2="${W-R}" y2="${y}"/><text class="axistext" x="5" y="${y+4}">${fmtTime(v)}</text>`}
-  let xlabels=rows.map((r,i)=>i%Math.ceil(rows.length/6)===0?`<text class="axistext" x="${xs[i]-18}" y="${H-16}">${r.date.slice(0,4)}</text>`:'').join('');
+  let grids='';
+  scale.ticks.slice().reverse().forEach(v=>{
+    const y=T+(max-v)/(max-min)*(H-T-B);
+    grids+=`<line class="gridline" x1="${L}" y1="${y}" x2="${W-R}" y2="${y}"/><text class="axistext" x="5" y="${y+4}">${fmtTime(v)}</text>`;
+  });
+  const span=monthSpan(rows);
+  const labelEvery=Math.max(1,Math.ceil(rows.length/6));
+  const xlabels=rows.map((r,i)=>(i%labelEvery===0||i===rows.length-1)
+    ?`<text class="axistext" x="${xs[i]-22}" y="${H-16}">${dateTickLabel(r.date,span)}</text>`:'').join('');
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grids}${lines}${points}${xlabels}</svg>`;
 }
 
@@ -128,7 +329,7 @@ function showEvent(id){
   <div class="card"><div class="label">FINA-poäng</div><div class="metric">${pbPts===null?'—':pbPts}</div><div class="muted">${pbPts===null?(['15','25'].includes(e.course)?'15 m ger inga FINA-poäng':'Kräver WR + registrerad tid'):'baserat på PB'}</div></div>
  </div>
  <div class="section"><button class="btn" onclick="openAdd('swim','${id}')">+ Lägg till tider</button></div>
- <div class="section card chartcard"><div class="sectionhead"><h2>Utveckling över tid</h2></div><div class="club-legend"><span><i class="dot lsk"></i>LSK</span><span><i class="dot neppan"></i>Neptun</span><span><i class="dot skk"></i>SKK</span></div><div class="chart">${chartSVG(rows)}</div></div>
+ <div class="section card chartcard"><div class="sectionhead"><h2>Utveckling över tid</h2></div>${rangeHtml('swim',(chartRanges.swim[id]||{}).from||'',(chartRanges.swim[id]||{}).to||'',availableMonthsFromRows(rows),`setSwimRange('${id}')`,'swim',id)}<div class="club-legend"><span><i class="dot lsk"></i>LSK</span><span><i class="dot neppan"></i>Neptun</span><span><i class="dot skk"></i>SKK</span></div><div class="chart">${chartSVG(filterRowsByMonth(rows,(chartRanges.swim[id]||{}).from||'',(chartRanges.swim[id]||{}).to||''))}</div></div>
  <div class="section card"><div class="sectionhead"><h2>Tider</h2></div><table class="table"><thead><tr><th>Tid</th><th>Datum</th><th>Klubb</th><th>FINA-poäng</th><th></th></tr></thead><tbody>${rows.slice().reverse().map(r=>{let c=clubFor(r.date),pts=(base&&!['15','25'].includes(e.course))?Math.round(fina(base,Number(r.time))):null;return `<tr><td><b>${fmtTime(r.time)}</b></td><td>${r.date}</td><td><span class="tag ${c.cls}">${c.name}</span></td><td>${pts===null?'—':'<b>'+pts+'</b>'}</td><td><button type="button" class="ghost" style="padding:6px 9px" onclick="deleteTime(${data.indexOf(r)},'${id}');return false;">Ta bort</button></td></tr>`}).join('')||'<tr><td colspan="5" class="empty">Inga tider ännu.</td></tr>'}</tbody></table></div>`;
 }
 function openWR(id){
@@ -252,25 +453,114 @@ async function initApp(){
 
 function renderHome(){
  const eligible=EVENTS.filter(e=>!['15','25'].includes(e.course));
- const best=eligible.map(e=>{const rows=data.filter(r=>r.event===e.id&&getWR(e.id));if(!rows.length)return null;const pb=Math.min(...rows.map(r=>Number(r.time)));return {e,pb,pts:fina(getWR(e.id),pb)}}).filter(Boolean).sort((a,b)=>b.pts-a.pts).slice(0,3);
- document.getElementById('topThree').innerHTML=best.length?best.map((x,i)=>`<div class="card"><div class="label">#${i+1} · ${x.e.label}</div><div class="big">${Math.round(x.pts)} pts</div><div class="delta">PB · ${fmtTime(x.pb)}</div></div>`).join(''):'<div class="empty">Lägg in tider och WR för att se topp 3.</div>';
- const dates=data.filter(r=>r.event&&eventById(r.event)?.course!=='15').map(r=>r.date).sort();
- if(!dates.length){document.getElementById('avgChart').innerHTML='<div class="empty">Lägg in tider + WR för att börja se månadsutvecklingen.</div>';document.getElementById('avgLegend').innerHTML='';return}
- let first=new Date(dates[0]+'T00:00:00'),last=new Date(dates[dates.length-1]+'T00:00:00');first=new Date(first.getFullYear(),first.getMonth(),1);last=new Date(last.getFullYear(),last.getMonth(),1);
- const months=[];for(let d=new Date(first);d<=last;d.setMonth(d.getMonth()+1))months.push(new Date(d));
- const points=months.map(m=>{
-  const cutoff=new Date(m.getFullYear(),m.getMonth()+1,0), vals=[];
-  eligible.forEach(e=>{if(!getWR(e.id))return;const rows=data.filter(r=>r.event===e.id&&new Date(r.date+'T00:00:00')<=cutoff).sort((a,b)=>a.date.localeCompare(b.date));if(rows.length){const r=rows[rows.length-1];vals.push({pts:fina(getWR(e.id),Number(r.time)),club:clubFor(r.date).name,date:r.date})}});
-  if(!vals.length)return null;return {m,avg:vals.reduce((a,x)=>a+x.pts,0)/vals.length,club:vals[vals.length-1].club};
+
+ const best=eligible.map(e=>{
+   const rows=data.filter(r=>r.event===e.id&&getWR(e.id));
+   if(!rows.length)return null;
+   const pb=Math.min(...rows.map(r=>Number(r.time)));
+   return {e,pb,pts:fina(getWR(e.id),pb)};
+ }).filter(Boolean).sort((a,b)=>b.pts-a.pts).slice(0,3);
+
+ document.getElementById('topThree').innerHTML=best.length
+   ?best.map((x,i)=>`<div class="card"><div class="label">#${i+1} · ${x.e.label}</div><div class="big">${Math.round(x.pts)} pts</div><div class="delta">PB · ${fmtTime(x.pb)}</div></div>`).join('')
+   :'<div class="empty">Lägg in tider och WR för att se topp 3.</div>';
+
+
+ const validDates=data
+   .filter(r=>{
+     const e=eventById(r.event);
+     return r.event&&e&&!['15','25'].includes(e.course);
+   })
+   .map(r=>r.date).sort();
+
+ const controls=document.getElementById('homeRangeControls');
+ if(controls){
+   const homeMonths=availableMonthsFromRows(validDates.map(date=>({date})));
+   controls.innerHTML=rangeHtml('home',chartRanges.home.from,chartRanges.home.to,homeMonths,'setHomeRange()','home','');
+ }
+
+ if(!validDates.length){
+   document.getElementById('avgChart').innerHTML='<div class="empty">Lägg in tider + WR för att börja se månadsutvecklingen.</div>';
+   document.getElementById('avgLegend').innerHTML='';
+   return;
+ }
+
+ let first=new Date(validDates[0]+'T00:00:00'),
+     last=new Date(validDates[validDates.length-1]+'T00:00:00');
+ first=new Date(first.getFullYear(),first.getMonth(),1);
+ last=new Date(last.getFullYear(),last.getMonth(),1);
+
+ const months=[];
+ for(let d=new Date(first);d<=last;d.setMonth(d.getMonth()+1))months.push(new Date(d));
+
+ let points=months.map(m=>{
+   const cutoff=new Date(m.getFullYear(),m.getMonth()+1,0);
+   const monthKey=`${cutoff.getFullYear()}-${String(cutoff.getMonth()+1).padStart(2,'0')}`;
+   const cutoffStr=`${monthKey}-${String(cutoff.getDate()).padStart(2,'0')}`;
+   const vals=[];
+
+   eligible.forEach(e=>{
+     if(!getWR(e.id))return;
+     const rows=data.filter(r=>r.event===e.id && r.date<=cutoffStr).sort((a,b)=>a.date.localeCompare(b.date));
+     if(rows.length){
+       const r=rows[rows.length-1];
+       vals.push(fina(getWR(e.id),Number(r.time)));
+     }
+   });
+
+   if(!vals.length)return null;
+   return {
+     m,
+     monthKey,
+     avg:vals.reduce((a,x)=>a+x,0)/vals.length,
+     club:clubFor(cutoffStr).name,
+     count:vals.length
+   };
  }).filter(Boolean);
- if(!points.length){document.getElementById('avgChart').innerHTML='<div class="empty">Lägg in tider + WR för att börja se månadsutvecklingen.</div>';return}
- const W=900,H=335,L=58,R=20,T=25,B=48,vals=points.map(p=>p.avg),min=Math.min(...vals),max=Math.max(...vals),pad=Math.max((max-min)*.18,10),xs=points.map((p,i)=>L+(points.length===1?(W-L-R)/2:i*(W-L-R)/(points.length-1))),ys=points.map(p=>T+(max+pad-p.avg)/(max+2*pad-min)*(H-T-B));
- let grid='';for(let i=0;i<5;i++){let y=T+i*(H-T-B)/4,v=max+pad-i*(max+2*pad-min)/4;grid+=`<line class="gridline" x1="${L}" y1="${y}" x2="${W-R}" y2="${y}"/><text class="axistext" x="5" y="${y+4}">${Math.round(v)}</text>`}
- let lines='',pts='';for(let i=0;i<points.length;i++){if(i){let color=clubColor(points[i].club);lines+=`<line class="plot" stroke="${color}" x1="${xs[i-1]}" y1="${ys[i-1]}" x2="${xs[i]}" y2="${ys[i]}"/>`}let color=clubColor(points[i].club);pts+=`<circle class="point" fill="${color}" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${Math.round(points[i].avg)} FINA · ${points[i].m.getFullYear()}-${String(points[i].m.getMonth()+1).padStart(2,'0')} · ${points[i].club}</title></circle>`}
- let labels=points.map((p,i)=>(i%Math.ceil(points.length/8)===0||i===points.length-1)?`<text class="axistext" x="${xs[i]-18}" y="${H-16}">${p.m.getFullYear()}-${String(p.m.getMonth()+1).padStart(2,'0')}</text>`:'').join('');
+
+ points=points.filter(p=>
+   (!chartRanges.home.from||p.monthKey>=chartRanges.home.from)&&
+   (!chartRanges.home.to||p.monthKey<=chartRanges.home.to)
+ );
+
+ if(!points.length){
+   document.getElementById('avgChart').innerHTML='<div class="empty">Inga FINA-värden i den valda perioden.</div>';
+   document.getElementById('avgLegend').innerHTML='';
+   return;
+ }
+
+ const W=900,H=335,L=58,R=20,T=25,B=48;
+ const scale=niceScale(points.map(p=>p.avg),'fina',4);
+ const min=scale.min,max=scale.max;
+ const xs=points.map((p,i)=>L+(points.length===1?(W-L-R)/2:i*(W-L-R)/(points.length-1)));
+ const ys=points.map(p=>T+(max-p.avg)/(max-min)*(H-T-B));
+
+ let grid='';
+ scale.ticks.slice().reverse().forEach(v=>{
+   const y=T+(max-v)/(max-min)*(H-T-B);
+   grid+=`<line class="gridline" x1="${L}" y1="${y}" x2="${W-R}" y2="${y}"/><text class="axistext" x="7" y="${y+4}">${Math.round(v)}</text>`;
+ });
+
+ let lines='',pts='';
+ for(let i=0;i<points.length;i++){
+   const color=clubColor(points[i].club);
+   if(i)lines+=`<line class="plot" stroke="${color}" x1="${xs[i-1]}" y1="${ys[i-1]}" x2="${xs[i]}" y2="${ys[i]}"/>`;
+   pts+=`<circle class="point" fill="${color}" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${Math.round(points[i].avg)} FINA · ${points[i].monthKey} · ${points[i].club} · ${points[i].count} grenar</title></circle>`;
+ }
+
+ const labelStep=Math.max(1,Math.ceil(points.length/7));
+ const labels=points.map((p,i)=>
+   (i%labelStep===0||i===points.length-1)
+   ?`<text class="axistext" x="${xs[i]-22}" y="${H-16}">${p.monthKey}</text>`:''
+ ).join('');
+
  document.getElementById('avgChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grid}${lines}${pts}${labels}</svg>`;
- document.getElementById('avgLegend').innerHTML='<span><i class="dot lsk"></i>LSK</span><span><i class="dot neppan"></i>Neptun</span><span><i class="dot skk"></i>SKK</span>';
+ document.getElementById('avgLegend').innerHTML=
+   '<span><i class="dot lsk"></i>LSK · 2018–sep 2024 & aug 2026–</span>'+
+   '<span><i class="dot neppan"></i>Neptun · okt 2024–jul 2025</span>'+
+   '<span><i class="dot skk"></i>SKK · aug 2025–jul 2026</span>';
 }
+
 async function deleteGymLog(id){
   if(!id)return;
   if(!window.confirm('Ta bort det här gymresultatet?'))return;
@@ -279,12 +569,55 @@ async function deleteGymLog(id){
   await loadGymLogs();renderGym();renderHome();
 }
 function renderGym(){
- let exercises=[...new Set(gym.map(x=>x.exercise))],sel=document.getElementById('exerciseSelect');let old=sel.value;
- sel.innerHTML=exercises.length?exercises.map(x=>`<option>${x}</option>`).join(''):'<option value="">— Ingen övning ännu —</option>';if(exercises.includes(old))sel.value=old;
- let chosen=sel.value,rows=gym.filter(x=>x.exercise===chosen).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById('gymCount').textContent=exercises.length;
+ let exercises=[...new Set(gym.map(x=>x.exercise))],
+     sel=document.getElementById('exerciseSelect'),
+     old=sel.value;
+
+ sel.innerHTML=exercises.length
+   ?exercises.map(x=>`<option>${x}</option>`).join('')
+   :'<option value="">— Ingen övning ännu —</option>';
+
+ if(exercises.includes(old))sel.value=old;
+ let chosen=sel.value,
+     rows=gym.filter(x=>x.exercise===chosen).sort((a,b)=>a.date.localeCompare(b.date));
+
+ document.getElementById('gymCount').textContent=exercises.length;
  document.getElementById('gymChartTitle').textContent=chosen||'Välj en övning';
- if(chosen&&rows.length){let vals=rows.map(x=>x.weight),min=Math.min(...vals),max=Math.max(...vals),pad=Math.max((max-min)*.22,2),W=900,H=330,L=58,R=20,T=25,B=48,xs=rows.map((r,i)=>L+(rows.length===1?(W-L-R)/2:i*(W-L-R)/(rows.length-1))),ys=rows.map(r=>T+(max+pad-r.weight)/(max+2*pad-min)*(H-T-B));let path=xs.map((x,i)=>(i?'L':'M')+' '+x+' '+ys[i]).join(' ');document.getElementById('gymChart').innerHTML=`<div class="chart"><svg viewBox="0 0 900 330" preserveAspectRatio="none"><path class="plot" stroke="var(--accent)" d="${path}"/>${rows.map((r,i)=>`<circle class="point" fill="var(--accent)" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${r.weight} kg × ${r.reps} · ${r.date}</title></circle>`).join('')}</svg></div>`}else document.getElementById('gymChart').innerHTML='<div class="empty">Välj eller lägg till en övning för att se grafen.</div>';
- document.getElementById('gymTable').innerHTML=gym.slice().reverse().map(r=>`<tr><td>${r.exercise}</td><td><b>${r.weight} kg</b></td><td>${r.reps}</td><td>${r.date}</td><td><button type="button" class="ghost" style="padding:6px 9px" onclick="deleteGymLog('${r.id}')">Ta bort</button></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Inga lyft registrerade ännu.</td></tr>';
+
+ const controls=document.getElementById('gymRangeControls');
+ if(controls)controls.innerHTML=rangeHtml('gym',chartRanges.gym.from,chartRanges.gym.to,availableMonthsFromRows(rows),'setGymRange()','gym','');
+
+ const chartRows=filterRowsByMonth(rows,chartRanges.gym.from,chartRanges.gym.to);
+
+ if(chosen&&chartRows.length){
+   const W=900,H=330,L=58,R=20,T=25,B=48;
+   const scale=niceScale(chartRows.map(x=>Number(x.weight)),'weight',4);
+   const min=scale.min,max=scale.max;
+   const xs=chartRows.map((r,i)=>L+(chartRows.length===1?(W-L-R)/2:i*(W-L-R)/(chartRows.length-1)));
+   const ys=chartRows.map(r=>T+(max-Number(r.weight))/(max-min)*(H-T-B));
+
+   let grid='';
+   scale.ticks.slice().reverse().forEach(v=>{
+     const y=T+(max-v)/(max-min)*(H-T-B);
+     grid+=`<line class="gridline" x1="${L}" y1="${y}" x2="${W-R}" y2="${y}"/><text class="axistext" x="7" y="${y+4}">${Number(v.toFixed(1))}</text>`;
+   });
+
+   const path=xs.map((x,i)=>(i?'L':'M')+' '+x+' '+ys[i]).join(' ');
+   const span=monthSpan(chartRows);
+   const labelEvery=Math.max(1,Math.ceil(chartRows.length/6));
+   const labels=chartRows.map((r,i)=>(i%labelEvery===0||i===chartRows.length-1)
+     ?`<text class="axistext" x="${xs[i]-22}" y="${H-16}">${dateTickLabel(r.date,span)}</text>`:'').join('');
+
+   document.getElementById('gymChart').innerHTML=`<div class="chart"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grid}<path class="plot" stroke="var(--accent)" d="${path}"/>${chartRows.map((r,i)=>`<circle class="point" fill="var(--accent)" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${r.weight} kg × ${r.reps} · ${r.date}</title></circle>`).join('')}${labels}</svg></div>`;
+ }else{
+   document.getElementById('gymChart').innerHTML=chosen
+     ?'<div class="empty">Inga lyft i den valda perioden.</div>'
+     :'<div class="empty">Välj eller lägg till en övning för att se grafen.</div>';
+ }
+
+ document.getElementById('gymTable').innerHTML=chosen
+   ?rows.slice().reverse().map(r=>`<tr><td>${r.exercise}</td><td><b>${r.weight} kg</b></td><td>${r.reps}</td><td>${r.date}</td><td><button type="button" class="ghost" style="padding:6px 9px" onclick="deleteGymLog('${r.id}')">Ta bort</button></td></tr>`).join('')
+   :'<tr><td colspan="5" class="empty">Välj en övning för att se dess lyft.</td></tr>';
 }
 initApp();
 </script></body></html>
