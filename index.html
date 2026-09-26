@@ -279,29 +279,98 @@ document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>nav(b.dataset.page
 
 function chartSVG(rows, id='chart') {
   if(!rows.length) return '<div class="empty">Inga registrerade tider i den valda perioden.</div>';
+
+  rows=rows.slice().sort((a,b)=>a.date.localeCompare(b.date));
+
   const vals=rows.map(r=>Number(r.time)).filter(Number.isFinite);
   const scale=niceScale(vals,'time',4);
   const min=scale.min,max=scale.max;
-  const W=900,H=330,L=62,R=20,T=25,B=48;
-  const xs=rows.map((r,i)=>L+(rows.length===1?(W-L-R)/2:i*(W-L-R)/(rows.length-1)));
-  const ys=rows.map(r=>T+(max-Number(r.time))/(max-min)*(H-T-B));
+
+  const W=900,H=330,L=68,R=22,T=25,B=52;
+
+  // Verklig tidsaxel: avståndet mellan punkter följer faktiskt datumavstånd.
+  const dayMs=24*60*60*1000;
+  const dates=rows.map(r=>new Date(r.date+'T12:00:00').getTime());
+  let minDate=Math.min(...dates),maxDate=Math.max(...dates);
+  if(minDate===maxDate){
+    minDate-=15*dayMs;
+    maxDate+=15*dayMs;
+  }
+  const xPad=Math.max((maxDate-minDate)*0.025,dayMs);
+  const xMin=minDate-xPad,xMax=maxDate+xPad;
+  const xs=dates.map(d=>L+(d-xMin)/(xMax-xMin)*(W-L-R));
+
+  // Snabbare (lägre) tider ligger högre upp.
+  const ys=rows.map(r=>T+(Number(r.time)-min)/(max-min)*(H-T-B));
+
   let lines='',points='';
   for(let i=0;i<rows.length;i++){
     const c=clubFor(rows[i].date);
     const color=clubColor(c.name);
-    if(i>0)lines+=`<line class="plot" stroke="${color}" x1="${xs[i-1]}" y1="${ys[i-1]}" x2="${xs[i]}" y2="${ys[i]}"/>`;
-    points+=`<circle class="point" fill="${color}" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${fmtTime(rows[i].time)} · ${rows[i].date} · ${c.name}</title></circle>`;
+    if(i>0){
+      lines+=`<line class="plot" stroke="${color}" x1="${xs[i-1]}" y1="${ys[i-1]}" x2="${xs[i]}" y2="${ys[i]}"/>`;
+    }
+    // Inga datapunkter/prickar – bara den sammanhängande linjen.
   }
+
+  // Jämna tidsvärden på Y-axeln.
   let grids='';
-  scale.ticks.slice().reverse().forEach(v=>{
-    const y=T+(max-v)/(max-min)*(H-T-B);
+  scale.ticks.forEach(v=>{
+    const y=T+(v-min)/(max-min)*(H-T-B);
     grids+=`<line class="gridline" x1="${L}" y1="${y}" x2="${W-R}" y2="${y}"/><text class="axistext" x="5" y="${y+4}">${fmtTime(v)}</text>`;
   });
-  const span=monthSpan(rows);
-  const labelEvery=Math.max(1,Math.ceil(rows.length/6));
-  const xlabels=rows.map((r,i)=>(i%labelEvery===0||i===rows.length-1)
-    ?`<text class="axistext" x="${xs[i]-22}" y="${H-16}">${dateTickLabel(r.date,span)}</text>`:'').join('');
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grids}${lines}${points}${xlabels}</svg>`;
+
+  // Anpassade månads-/årsmarkeringar på den riktiga tidsaxeln.
+  const spanDays=(maxDate-minDate)/dayMs;
+  let tickDates=[];
+
+  function addMonthTicks(stepMonths){
+    let d=new Date(minDate);
+    d=new Date(d.getFullYear(),d.getMonth(),1,12);
+    if(d.getTime()<minDate)d=new Date(d.getFullYear(),d.getMonth()+stepMonths,1,12);
+    while(d.getTime()<=maxDate){
+      tickDates.push(new Date(d));
+      d=new Date(d.getFullYear(),d.getMonth()+stepMonths,1,12);
+    }
+  }
+
+  function addYearTicks(stepYears){
+    let d=new Date(new Date(minDate).getFullYear(),0,1,12);
+    if(d.getTime()<minDate)d=new Date(d.getFullYear()+stepYears,0,1,12);
+    while(d.getTime()<=maxDate){
+      tickDates.push(new Date(d));
+      d=new Date(d.getFullYear()+stepYears,0,1,12);
+    }
+  }
+
+  if(spanDays<=120) addMonthTicks(1);
+  else if(spanDays<=370) addMonthTicks(2);
+  else if(spanDays<=800) addMonthTicks(3);
+  else if(spanDays<=1600) addMonthTicks(6);
+  else addYearTicks(spanDays>3650?2:1);
+
+  if(!tickDates.length){
+    tickDates=[new Date(minDate),new Date(maxDate)];
+  }
+
+  let xgrid='',xlabels='';
+  tickDates.forEach(d=>{
+    const ts=d.getTime();
+    const x=L+(ts-xMin)/(xMax-xMin)*(W-L-R);
+    if(x<L-1||x>W-R+1)return;
+
+    xgrid+=`<line class="gridline" x1="${x}" y1="${T}" x2="${x}" y2="${H-B}"/>`;
+
+    let label;
+    if(spanDays>800){
+      label=String(d.getFullYear());
+    }else{
+      label=`${MONTH_NAMES[d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`;
+    }
+    xlabels+=`<text class="axistext" text-anchor="middle" x="${x}" y="${H-17}">${label}</text>`;
+  });
+
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grids}${xgrid}${lines}${points}${xlabels}</svg>`;
 }
 
 async function deleteTime(index,eventId){
